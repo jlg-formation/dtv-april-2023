@@ -9,7 +9,8 @@
 <style scoped lang="scss">
 div {
   flex: 1;
-  border: 0.02em solid black;
+  border: 0.01em solid black;
+  display: flex;
 
   canvas {
     background-color: white;

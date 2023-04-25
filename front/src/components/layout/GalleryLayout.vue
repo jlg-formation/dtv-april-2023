@@ -16,7 +16,7 @@ div {
   align-items: center;
   justify-content: space-between;
   button {
-    height: 4em;
+    height: 100%;
   }
 
   div.button {
