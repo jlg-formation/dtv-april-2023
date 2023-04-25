@@ -1,12 +1,31 @@
 <script setup lang="ts"></script>
 
 <template>
-  <div>Gallery works!</div>
+  <div>
+    <div class="button">
+      <button>Memoriser</button>
+    </div>
+    <div class="slider"></div>
+  </div>
 </template>
 
-<style scoped>
+<style scoped lang="scss">
 div {
   height: 5em;
-  border: 0.1em solid black;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  button {
+    height: 4em;
+  }
+
+  div.button {
+    padding: 1em;
+  }
+
+  div.slider {
+    background-color: #ddd;
+    flex: 1;
+  }
 }
 </style>
