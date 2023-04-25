@@ -1,7 +1,10 @@
 <script setup lang="ts"></script>
 
 <template>
-  <div>Header works!</div>
+  <div>
+    <a href="#"> Mandelbrot dataviz </a>
+    <font-awesome-icon icon="fa-solid fa-user-secret" />
+  </div>
 </template>
 
 <style scoped>
