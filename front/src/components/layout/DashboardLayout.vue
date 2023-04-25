@@ -1,12 +1,20 @@
 <script setup lang="ts"></script>
 
 <template>
-  <div>DashboardLayout works!</div>
+  <div>
+    <canvas></canvas>
+  </div>
 </template>
 
-<style scoped>
+<style scoped lang="scss">
 div {
   flex: 1;
-  border: 0.1em solid black;
+  border: 0.02em solid black;
+
+  canvas {
+    background-color: white;
+    width: 100%;
+    height: 100%;
+  }
 }
 </style>
