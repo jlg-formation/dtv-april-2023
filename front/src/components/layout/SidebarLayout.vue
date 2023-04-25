@@ -1,7 +1,12 @@
 <script setup lang="ts"></script>
 
 <template>
-  <p>Sidebar works!</p>
+  <div>Sidebar works!</div>
 </template>
 
-<style scoped></style>
+<style scoped>
+div {
+  width: 20em;
+  border: 0.1em solid black;
+}
+</style>

@@ -1,7 +1,12 @@
 <script setup lang="ts"></script>
 
 <template>
-  <p>Gallery works!</p>
+  <div>Gallery works!</div>
 </template>
 
-<style scoped></style>
+<style scoped>
+div {
+  height: 5em;
+  border: 0.1em solid black;
+}
+</style>

@@ -14,4 +14,10 @@ import DashboardLayout from './components/layout/DashboardLayout.vue'
   </div>
 </template>
 
-<style scoped></style>
+<style scoped>
+div.content {
+  flex: 1;
+  display: flex;
+  align-items: stretch;
+}
+</style>

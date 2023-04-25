@@ -1,7 +1,12 @@
 <script setup lang="ts"></script>
 
 <template>
-  <p>Header works!</p>
+  <div>Header works!</div>
 </template>
 
-<style scoped></style>
+<style scoped>
+div {
+  height: 3em;
+  border: 0.1em solid black;
+}
+</style>

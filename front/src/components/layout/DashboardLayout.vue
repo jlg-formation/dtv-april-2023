@@ -1,7 +1,12 @@
 <script setup lang="ts"></script>
 
 <template>
-  <p>DashboardLayout works!</p>
+  <div>DashboardLayout works!</div>
 </template>
 
-<style scoped></style>
+<style scoped>
+div {
+  flex: 1;
+  border: 0.1em solid black;
+}
+</style>
