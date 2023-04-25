@@ -3,13 +3,28 @@
 <template>
   <div>
     <a href="#"> Mandelbrot dataviz </a>
-    <font-awesome-icon icon="fa-solid fa-user-secret" />
+    <font-awesome-icon icon="fa-solid fa-bars" />
   </div>
 </template>
 
-<style scoped>
+<style scoped lang="scss">
 div {
   height: 3em;
-  border: 0.1em solid black;
+  background-color: #eee;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 0.5em;
+  font-size: 1.3em;
+
+  a {
+    text-decoration: inherit;
+    color: inherit;
+    font-weight: bold;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
 }
 </style>
