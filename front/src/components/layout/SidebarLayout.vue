@@ -1,8 +1,17 @@
-<script setup lang="ts"></script>
+<script setup lang="ts">
+import type { Complex } from '@/interfaces/Complex'
+import { add, complexToString } from '@/utils/math'
+
+const a: Complex = { x: 12, y: 13 }
+const b: Complex = { x: 3, y: 5 }
+const c = add(a, b)
+</script>
 
 <template>
   <div class="sidebar">
-    <div class="info"></div>
+    <div class="info">
+      {{ complexToString(a) }} + {{ complexToString(b) }} = {{ complexToString(c) }}
+    </div>
     <div class="command"></div>
     <div class="diagram"></div>
   </div>
