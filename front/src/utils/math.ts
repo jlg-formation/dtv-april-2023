@@ -14,6 +14,10 @@ export const multiply = (a: Complex, b: Complex): Complex => {
   }
 }
 
+export const module = (a: Complex): number => {
+  return Math.sqrt(a.x * a.x + a.y * a.y)
+}
+
 export const complexToString = (a: Complex): string => {
   return `(${a.x} + i${a.y})`
 }
