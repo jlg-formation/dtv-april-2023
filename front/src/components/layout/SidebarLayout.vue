@@ -1,10 +1,11 @@
 <script setup lang="ts">
 import CommandBar from '../sidebar/CommandBar.vue'
+import InfoBar from '../sidebar/InfoBar.vue'
 </script>
 
 <template>
   <div class="sidebar">
-    <div class="info"></div>
+    <InfoBar />
     <CommandBar />
     <div class="diagram"></div>
   </div>

@@ -3,6 +3,7 @@ import { MandelBrot } from './MandelBrot'
 import { getMandelbrotNumber } from '@/utils/mandelbrot'
 import { getColor } from '@/utils/color'
 import type { ViewPort } from '@/interfaces/ViewPort'
+import { profile } from '@/decorators/profile'
 
 export interface BoardConfig {
   fractal: MandelBrot
@@ -33,10 +34,13 @@ export class Board {
       (this.config.viewPort.width * this.canvas.height) / this.canvas.width
   }
 
+  @profile()
   draw() {
     const width = this.canvas.width
+    console.log('width: ', width)
     // const width = 10
     const height = this.canvas.height
+    console.log('height: ', height)
     // const height = 20
     const ctx = getContext(this.canvas)
 
@@ -61,16 +65,6 @@ export class Board {
       }
     }
     ctx.putImageData(imageData, 0, 0)
-
-    // const imageData = ctx.getImageData(0, 0, 10, 15)
-    // const data = imageData.data
-    // for (let i = 0; i < data.length; i += 4) {
-    //   data[i] = 255 // red
-    //   data[i + 1] = 100 // green
-    //   data[i + 2] = 100 // blue
-    //   data[i + 3] = 127
-    // }
-    // ctx.putImageData(imageData, 0, 0)
   }
 
   setConfig(config: Partial<BoardConfig>) {
