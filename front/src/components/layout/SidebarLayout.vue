@@ -1,16 +1,16 @@
 <script setup lang="ts">
 import type { Complex } from '@/interfaces/Complex'
-import { add, complexToString } from '@/utils/math'
+import { complexToString, multiply } from '@/utils/math'
 
-const a: Complex = { x: 12, y: 13 }
-const b: Complex = { x: 3, y: 5 }
-const c = add(a, b)
+const a: Complex = { x: 2, y: 3 }
+const b: Complex = { x: 1, y: 2 }
+const c = multiply(a, b)
 </script>
 
 <template>
   <div class="sidebar">
     <div class="info">
-      {{ complexToString(a) }} + {{ complexToString(b) }} = {{ complexToString(c) }}
+      {{ complexToString(a) }} * {{ complexToString(b) }} = {{ complexToString(c) }}
     </div>
     <div class="command"></div>
     <div class="diagram"></div>
