@@ -13,10 +13,10 @@ export class Board {
   config: BoardConfig = {
     fractal: new MandelBrot(),
     viewPort: {
-      x: -2,
-      y: -1,
-      width: 4,
-      height: 2
+      x: -2.5,
+      y: -1.5,
+      width: 5,
+      height: 3
     }
   }
 
