@@ -7,6 +7,13 @@ export const add = (a: Complex, b: Complex): Complex => {
   }
 }
 
+export const multiply = (a: Complex, b: Complex): Complex => {
+  return {
+    x: a.x * b.x - a.y * b.y,
+    y: a.x * b.y + a.y * b.x
+  }
+}
+
 export const complexToString = (a: Complex): string => {
-  return `${a.x} + i${a.y}`
+  return `(${a.x} + i${a.y})`
 }
