@@ -1,7 +1,4 @@
 <script setup lang="ts">
-import type { Complex } from '@/interfaces/Complex'
-import { complexToString } from '@/utils/math'
-import { increment } from '@/utils/mandelbrot'
 import CommandBar from '../sidebar/CommandBar.vue'
 </script>
 

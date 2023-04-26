@@ -1,19 +1,18 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { useConfigStore } from '@/stores/config'
 
-const iterationMax = ref(50)
-const limit = ref(40)
+const configStore = useConfigStore()
 </script>
 
 <template>
   <div class="command">
     <label>
-      <span>Iteration Max: {{ iterationMax }}</span>
-      <input type="range" min="1" max="1000" v-model="iterationMax" />
+      <span>Iteration Max: {{ configStore.iterationMax }}</span>
+      <input type="range" min="1" max="1000" v-model="configStore.iterationMax" />
     </label>
     <label>
-      <span>Limit: {{ limit }}</span>
-      <input type="range" min="1" max="1000" v-model="limit" />
+      <span>Limit: {{ configStore.limit }}</span>
+      <input type="range" min="1" max="1000" v-model="configStore.limit" />
     </label>
   </div>
 </template>

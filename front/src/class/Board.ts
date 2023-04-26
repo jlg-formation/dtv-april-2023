@@ -7,6 +7,8 @@ import type { ViewPort } from '@/interfaces/ViewPort'
 export interface BoardConfig {
   fractal: MandelBrot
   viewPort: ViewPort
+  iterationMax: number
+  limit: number
 }
 
 export class Board {
@@ -17,7 +19,9 @@ export class Board {
       y: -1.5,
       width: 5,
       height: 3
-    }
+    },
+    iterationMax: 1,
+    limit: 2
   }
 
   constructor(readonly canvas: HTMLCanvasElement) {
@@ -36,8 +40,8 @@ export class Board {
     // const height = 20
     const ctx = getContext(this.canvas)
 
-    const maxIteration = 50
-    const limit = 30
+    const iterationMax = this.config.iterationMax
+    const limit = this.config.limit
 
     const imageData = ctx.getImageData(0, 0, width, height)
     const data = imageData.data
@@ -48,8 +52,8 @@ export class Board {
         const xx = this.config.viewPort.x + (x * this.config.viewPort.width) / width
         const yy = this.config.viewPort.y + (y * this.config.viewPort.height) / height
 
-        const mandelbrotNbr = getMandelbrotNumber({ x: xx, y: yy }, maxIteration, limit)
-        const [red, green, blue] = getColor(mandelbrotNbr, maxIteration)
+        const mandelbrotNbr = getMandelbrotNumber({ x: xx, y: yy }, iterationMax, limit)
+        const [red, green, blue] = getColor(mandelbrotNbr, iterationMax)
         data[index] = red
         data[index + 1] = green
         data[index + 2] = blue
@@ -69,7 +73,7 @@ export class Board {
     // ctx.putImageData(imageData, 0, 0)
   }
 
-  setConfig(config: Partial<MandelBrot>) {
+  setConfig(config: Partial<BoardConfig>) {
     this.config = { ...this.config, ...config }
   }
 }
