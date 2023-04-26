@@ -19,6 +19,14 @@ onMounted(() => {
     limit: configStore.limit
   })
   board.draw()
+
+  configStore.$subscribe(() => {
+    board.setConfig({
+      iterationMax: configStore.iterationMax,
+      limit: configStore.limit
+    })
+    board.draw()
+  })
 })
 </script>
 
