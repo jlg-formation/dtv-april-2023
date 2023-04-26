@@ -1,13 +1,17 @@
 <script setup lang="ts">
 import type { Complex } from '@/interfaces/Complex'
-import { complexToString, module } from '@/utils/math'
+import { complexToString } from '@/utils/math'
+import { increment } from '@/utils/mandelbrot'
 
-const a: Complex = { x: 3, y: 4 }
+const z: Complex = { x: 0, y: 0 }
+const c: Complex = { x: 3, y: 4 }
 </script>
 
 <template>
   <div class="sidebar">
-    <div class="info">module{{ complexToString(a) }} = {{ module(a) }}</div>
+    <div class="info">
+      increment({{ complexToString(z) }}, {{ complexToString(c) }} = {{ increment(z, c) }}
+    </div>
     <div class="command"></div>
     <div class="diagram"></div>
   </div>
