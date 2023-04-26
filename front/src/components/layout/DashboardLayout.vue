@@ -3,10 +3,13 @@ import { Board } from '@/class/Board'
 import { MandelBrot } from '@/class/MandelBrot'
 import { useConfigStore } from '@/stores/config'
 import { onMounted, ref } from 'vue'
+import { Subject, debounceTime, tap } from 'rxjs'
 
 const canvas = ref<HTMLCanvasElement>()
 
 const configStore = useConfigStore()
+
+const configStore$ = new Subject<void>()
 
 onMounted(() => {
   if (canvas.value === undefined) {
@@ -21,12 +24,21 @@ onMounted(() => {
   board.draw()
 
   configStore.$subscribe(() => {
-    board.setConfig({
-      iterationMax: configStore.iterationMax,
-      limit: configStore.limit
-    })
-    board.draw()
+    configStore$.next()
   })
+
+  configStore$
+    .pipe(
+      debounceTime(300),
+      tap(() => {
+        board.setConfig({
+          iterationMax: configStore.iterationMax,
+          limit: configStore.limit
+        })
+        board.draw()
+      })
+    )
+    .subscribe()
 })
 </script>
 
