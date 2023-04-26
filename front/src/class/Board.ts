@@ -1,13 +1,23 @@
 import { getContext } from '@/utils/misc'
 import { MandelBrot } from './MandelBrot'
+import { getMandelbrotNumber } from '@/utils/mandelbrot'
+import { getColor } from '@/utils/color'
+import type { ViewPort } from '@/interfaces/ViewPort'
 
 export interface BoardConfig {
   fractal: MandelBrot
+  viewPort: ViewPort
 }
 
 export class Board {
   config: BoardConfig = {
-    fractal: new MandelBrot()
+    fractal: new MandelBrot(),
+    viewPort: {
+      x: -2,
+      y: -1,
+      width: 4,
+      height: 2
+    }
   }
 
   constructor(readonly canvas: HTMLCanvasElement) {
@@ -15,24 +25,35 @@ export class Board {
     console.log('rect: ', rect)
     this.canvas.width = rect.width
     this.canvas.height = rect.height
+    this.config.viewPort.height =
+      (this.config.viewPort.width * this.canvas.height) / this.canvas.width
   }
 
   draw() {
     const width = this.canvas.width
-    console.log('width: ', width)
+    // const width = 10
     const height = this.canvas.height
-    console.log('height: ', height)
+    // const height = 20
     const ctx = getContext(this.canvas)
+
+    const maxIteration = 50
+    const limit = 30
 
     const imageData = ctx.getImageData(0, 0, width, height)
     const data = imageData.data
     for (let x = 0; x < width; x++) {
       for (let y = 0; y < height; y++) {
         const index = (y * width + x) * 4
-        data[index] = 255
-        data[index + 1] = 255
-        data[index + 2] = 125
-        data[index + 3] = 125
+
+        const xx = this.config.viewPort.x + (x * this.config.viewPort.width) / width
+        const yy = this.config.viewPort.y + (y * this.config.viewPort.height) / height
+
+        const mandelbrotNbr = getMandelbrotNumber({ x: xx, y: yy }, maxIteration, limit)
+        const [red, green, blue] = getColor(mandelbrotNbr, maxIteration)
+        data[index] = red
+        data[index + 1] = green
+        data[index + 2] = blue
+        data[index + 3] = 255
       }
     }
     ctx.putImageData(imageData, 0, 0)
