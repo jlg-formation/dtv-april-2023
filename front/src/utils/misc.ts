@@ -49,3 +49,17 @@ export const getNewViewPort = (
     y: v.y - ratio.y * height
   }
 }
+
+export const zoom = (
+  event: WheelEvent,
+  canvas: HTMLCanvasElement,
+  viewPort: ViewPort
+): ViewPort => {
+  const zoomFactor = event.deltaY > 0 ? 0.5 : 2
+  const p = getCursorPositionInsideCanvas(canvas, event)
+  const v = getCursorPositionInsideViewPort(canvas, p, viewPort)
+  const ratio = getRatio(viewPort, v)
+
+  const newViewPort = getNewViewPort(zoomFactor, ratio, v, viewPort)
+  return newViewPort
+}

@@ -1,15 +1,9 @@
-import {
-  getContext,
-  getCursorPositionInsideCanvas,
-  getCursorPositionInsideViewPort,
-  getNewViewPort,
-  getRatio
-} from '@/utils/misc'
-import { MandelBrot } from './MandelBrot'
-import { getMandelbrotNumber } from '@/utils/mandelbrot'
-import { getColor } from '@/utils/color'
-import type { ViewPort } from '@/interfaces/ViewPort'
 import { profile } from '@/decorators/profile'
+import type { ViewPort } from '@/interfaces/ViewPort'
+import { getColor } from '@/utils/color'
+import { getMandelbrotNumber } from '@/utils/mandelbrot'
+import { getContext, zoom } from '@/utils/misc'
+import { MandelBrot } from './MandelBrot'
 
 export interface BoardConfig {
   fractal: MandelBrot
@@ -78,13 +72,7 @@ export class Board {
   setActions() {
     this.canvas.addEventListener('wheel', (event) => {
       console.log('event: ', event)
-      const zoomFactor = event.deltaY > 0 ? 0.5 : 2
-      const p = getCursorPositionInsideCanvas(this.canvas, event)
-      const v = getCursorPositionInsideViewPort(this.canvas, p, this.config.viewPort)
-      const ratio = getRatio(this.config.viewPort, v)
-
-      const newViewPort = getNewViewPort(zoomFactor, ratio, v, this.config.viewPort)
-      this.config.viewPort = newViewPort
+      this.config.viewPort = zoom(event, this.canvas, this.config.viewPort)
       this.draw()
     })
   }
