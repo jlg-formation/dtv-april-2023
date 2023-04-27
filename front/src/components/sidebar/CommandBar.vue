@@ -12,7 +12,7 @@ const configStore = useConfigStore()
     </label>
     <label>
       <span>Limit: {{ configStore.limit }}</span>
-      <input type="range" min="1" max="1000" v-model="configStore.limit" />
+      <input type="range" min="0.01" max="5" step="0.01" v-model="configStore.limit" />
     </label>
   </div>
 </template>
