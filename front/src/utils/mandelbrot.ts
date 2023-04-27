@@ -15,5 +15,3 @@ export const getMandelbrotNumber = (c: Complex, maxIteration: number, limit: num
   }
   return maxIteration
 }
-
-console.log('window.navigator.hardwareConcurrency: ', window.navigator.hardwareConcurrency)

@@ -1,4 +1,11 @@
+import type { ViewPort } from './ViewPort'
+
 export interface WorkerInputData {
   i: number
-  str: string
+  totalWorker: number
+  viewPort: ViewPort
+  width: number
+  height: number
+  iterationMax: number
+  limit: number
 }

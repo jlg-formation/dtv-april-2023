@@ -1,9 +1,10 @@
 import { profileAsync } from '@/decorators/profile'
 import type { ViewPort } from '@/interfaces/ViewPort'
 import type { WorkerInputData } from '@/interfaces/WorkerInputData'
+import type { WorkerOutputData } from '@/interfaces/WorkerOutputData'
 import { getColor } from '@/utils/color'
-import { getMandelbrotNumber } from '@/utils/mandelbrot'
 import { getContext, move, zoom } from '@/utils/misc'
+import { Mutex } from 'async-mutex'
 import { MandelBrot } from './MandelBrot'
 
 export interface BoardConfig {
@@ -12,6 +13,8 @@ export interface BoardConfig {
   limit: number
   viewPort: ViewPort
 }
+
+const mutex = new Mutex()
 
 export class Board {
   config: BoardConfig = {
@@ -46,57 +49,73 @@ export class Board {
     }
   }
 
-  @profileAsync()
-  draw(): Promise<void> {
+  private getArray(): Promise<number[][]> {
     return new Promise((resolve) => {
+      const arrayJobs: number[][][] = new Array(this.workers.length).fill(undefined)
       let finishedJobs = 0
       for (let i = 0; i < this.workers.length; i++) {
         const worker = this.workers[i]
         const workerInputData: WorkerInputData = {
           i: i,
-          str: 'coucou'
+          totalWorker: this.workers.length,
+          width: this.canvas.width,
+          height: this.canvas.height,
+          iterationMax: this.config.iterationMax,
+          limit: this.config.limit,
+          viewPort: this.config.viewPort
         }
         worker.postMessage(workerInputData)
-        worker.onmessage = (e: MessageEvent<string>) => {
+        worker.onmessage = (e: MessageEvent<WorkerOutputData>) => {
           finishedJobs++
           console.log(`worker finished: ${e.data}`)
+          const i = e.data.i
+          arrayJobs[i] = e.data.array
           if (finishedJobs === this.workers.length) {
             console.log('all jobs finished')
-
-            resolve()
+            const array: number[][] = []
+            resolve(array.concat(...arrayJobs))
           }
         }
       }
-      const width = this.canvas.width
-      console.log('width: ', width)
-      // const width = 10
-      const height = this.canvas.height
-      console.log('height: ', height)
-      // const height = 20
-      const ctx = getContext(this.canvas)
-
-      const iterationMax = this.config.iterationMax
-      const limit = this.config.limit
-
-      const imageData = ctx.getImageData(0, 0, width, height)
-      const data = imageData.data
-      for (let x = 0; x < width; x++) {
-        for (let y = 0; y < height; y++) {
-          const index = (y * width + x) * 4
-
-          const xx = this.config.viewPort.x + (x * this.config.viewPort.width) / width
-          const yy = this.config.viewPort.y + (y * this.config.viewPort.height) / height
-
-          const mandelbrotNbr = getMandelbrotNumber({ x: xx, y: yy }, iterationMax, limit)
-          const [red, green, blue] = getColor(mandelbrotNbr, iterationMax)
-          data[index] = red
-          data[index + 1] = green
-          data[index + 2] = blue
-          data[index + 3] = 255
-        }
-      }
-      ctx.putImageData(imageData, 0, 0)
     })
+  }
+
+  private async getSynchronizedArray(): Promise<number[][]> {
+    const release = await mutex.acquire()
+    try {
+      const array = await this.getArray()
+      return array
+    } finally {
+      release()
+    }
+  }
+
+  @profileAsync()
+  async draw(): Promise<void> {
+    const width = this.canvas.width
+    console.log('width: ', width)
+    // const width = 10
+    const height = this.canvas.height
+    console.log('height: ', height)
+    // const height = 20
+    const ctx = getContext(this.canvas)
+
+    const iterationMax = this.config.iterationMax
+    const array = await this.getSynchronizedArray()
+
+    const imageData = ctx.getImageData(0, 0, width, height)
+    const data = imageData.data
+    for (let x = 0; x < width; x++) {
+      for (let y = 0; y < height; y++) {
+        const [red, green, blue] = getColor(array[x][y], iterationMax)
+        const index = (y * width + x) * 4
+        data[index] = red
+        data[index + 1] = green
+        data[index + 2] = blue
+        data[index + 3] = 255
+      }
+    }
+    ctx.putImageData(imageData, 0, 0)
   }
 
   setActions() {
