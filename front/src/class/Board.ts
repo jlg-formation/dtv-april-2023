@@ -1,4 +1,5 @@
 import { profileAsync } from '@/decorators/profile'
+import type { Snapshot } from '@/interfaces/Snapshot'
 import type { ViewPort } from '@/interfaces/ViewPort'
 import type { WorkerInputData } from '@/interfaces/WorkerInputData'
 import type { WorkerOutputData } from '@/interfaces/WorkerOutputData'
@@ -18,6 +19,8 @@ export interface BoardConfig {
 const mutex = new Mutex()
 
 export class Board {
+  canvas = document.createElement('canvas')
+  ctx = getContext(this.canvas)
   config: BoardConfig = {
     fractal: new MandelBrot(),
     viewPort: {
@@ -32,12 +35,51 @@ export class Board {
 
   workers: Worker[] = []
 
-  constructor(readonly canvas: HTMLCanvasElement) {
-    this.resizeViewPort()
-
-    this.setActions()
+  constructor() {
     this.createWorkers()
   }
+
+  attachTo(divElt: HTMLDivElement) {
+    divElt.appendChild(board.canvas)
+    this.setActions()
+    this.resizeViewPort()
+  }
+
+  createWorkers() {
+    for (let i = 0; i < window.navigator.hardwareConcurrency; i++) {
+      this.workers.push(
+        new Worker(new URL('./workers/mandelbrot.ts', import.meta.url), { type: 'module' })
+      )
+    }
+  }
+
+  @profileAsync()
+  async draw(): Promise<void> {
+    const width = this.canvas.width
+
+    // const width = 10
+    const height = this.canvas.height
+
+    // const height = 20
+
+    const iterationMax = this.config.iterationMax
+    const array = await this.getSynchronizedArray()
+
+    const imageData = this.ctx.getImageData(0, 0, width, height)
+    const data = imageData.data
+    for (let x = 0; x < width; x++) {
+      for (let y = 0; y < height; y++) {
+        const [red, green, blue] = getColor(array[x][y], iterationMax)
+        const index = (y * width + x) * 4
+        data[index] = red
+        data[index + 1] = green
+        data[index + 2] = blue
+        data[index + 3] = 255
+      }
+    }
+    this.ctx.putImageData(imageData, 0, 0)
+  }
+
   resizeViewPort() {
     this.canvas.width = 0
     this.canvas.height = 0
@@ -58,42 +100,6 @@ export class Board {
     console.log('this.canvas.height: ', this.canvas.height)
     this.config.viewPort.height =
       (this.config.viewPort.width * this.canvas.height) / this.canvas.width
-  }
-
-  createWorkers() {
-    for (let i = 0; i < window.navigator.hardwareConcurrency; i++) {
-      this.workers.push(
-        new Worker(new URL('./workers/mandelbrot.ts', import.meta.url), { type: 'module' })
-      )
-    }
-  }
-
-  @profileAsync()
-  async draw(): Promise<void> {
-    const width = this.canvas.width
-
-    // const width = 10
-    const height = this.canvas.height
-
-    // const height = 20
-    const ctx = getContext(this.canvas)
-
-    const iterationMax = this.config.iterationMax
-    const array = await this.getSynchronizedArray()
-
-    const imageData = ctx.getImageData(0, 0, width, height)
-    const data = imageData.data
-    for (let x = 0; x < width; x++) {
-      for (let y = 0; y < height; y++) {
-        const [red, green, blue] = getColor(array[x][y], iterationMax)
-        const index = (y * width + x) * 4
-        data[index] = red
-        data[index + 1] = green
-        data[index + 2] = blue
-        data[index + 3] = 255
-      }
-    }
-    ctx.putImageData(imageData, 0, 0)
   }
 
   setActions() {
@@ -146,6 +152,16 @@ export class Board {
       .subscribe()
   }
 
+  takeSnapshot(): Snapshot {
+    const imageDataURL = this.canvas.toDataURL()
+    const snapshot: Snapshot = {
+      viewPort: { ...this.config.viewPort },
+      imageDataURL,
+      id: Math.round(Math.random() * 1e12)
+    }
+    return snapshot
+  }
+
   private getArray(): Promise<number[][]> {
     return new Promise((resolve) => {
       const arrayJobs: number[][][] = new Array(this.workers.length).fill(undefined)
@@ -186,3 +202,5 @@ export class Board {
     }
   }
 }
+
+export const board = new Board()
