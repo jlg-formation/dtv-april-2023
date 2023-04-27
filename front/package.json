@@ -21,6 +21,7 @@
     "@fortawesome/free-solid-svg-icons": "^6.4.0",
     "@fortawesome/vue-fontawesome": "^3.0.3",
     "async-mutex": "^0.4.0",
+    "d3": "^7.8.4",
     "pinia": "^2.0.32",
     "rxjs": "^7.8.0",
     "vue": "^3.2.47",
@@ -28,6 +29,7 @@
   },
   "devDependencies": {
     "@rushstack/eslint-patch": "^1.2.0",
+    "@types/d3": "^7.4.0",
     "@types/jsdom": "^21.1.0",
     "@types/node": "^18.14.2",
     "@vitejs/plugin-vue": "^4.0.0",
