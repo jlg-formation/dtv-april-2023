@@ -70,14 +70,32 @@ export class Board {
   }
 
   setActions() {
+    this.setZoomAction()
+    this.setMoveAction()
+  }
+
+  setConfig(config: Partial<BoardConfig>) {
+    this.config = { ...this.config, ...config }
+  }
+
+  setMoveAction() {
+    this.canvas.addEventListener('mousedown', (event) => {
+      console.log('mousedown event: ', event)
+
+      const onMouseUp = (event: MouseEvent) => {
+        console.log('mouseup event: ', event)
+        document.removeEventListener('mouseup', onMouseUp)
+      }
+
+      document.addEventListener('mouseup', onMouseUp)
+    })
+  }
+
+  setZoomAction() {
     this.canvas.addEventListener('wheel', (event) => {
       console.log('event: ', event)
       this.config.viewPort = zoom(event, this.canvas, this.config.viewPort)
       this.draw()
     })
-  }
-
-  setConfig(config: Partial<BoardConfig>) {
-    this.config = { ...this.config, ...config }
   }
 }
