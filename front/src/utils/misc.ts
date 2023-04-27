@@ -1,4 +1,4 @@
-import type { Point } from '@/interfaces/Point'
+import type { Point, Vector } from '@/interfaces/Point'
 import type { ViewPort } from '@/interfaces/ViewPort'
 
 export const getContext = (canvas: HTMLCanvasElement): CanvasRenderingContext2D => {
@@ -61,5 +61,32 @@ export const zoom = (
   const ratio = getRatio(viewPort, v)
 
   const newViewPort = getNewViewPort(zoomFactor, ratio, v, viewPort)
+  return newViewPort
+}
+
+export const move = (
+  startEvent: MouseEvent,
+  endEvent: MouseEvent,
+  canvas: HTMLCanvasElement,
+  viewPort: ViewPort
+): ViewPort => {
+  const startP = getCursorPositionInsideCanvas(canvas, startEvent)
+  const endP = getCursorPositionInsideCanvas(canvas, endEvent)
+
+  const startV = getCursorPositionInsideViewPort(canvas, startP, viewPort)
+  const endV = getCursorPositionInsideViewPort(canvas, endP, viewPort)
+
+  const delta: Vector = {
+    x: endV.x - startV.x,
+    y: endV.y - startV.y
+  }
+
+  const newViewPort: ViewPort = {
+    width: viewPort.width,
+    height: viewPort.height,
+    x: viewPort.x - delta.x,
+    y: viewPort.y - delta.y
+  }
+
   return newViewPort
 }

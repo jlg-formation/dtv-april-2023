@@ -2,7 +2,7 @@ import { profile } from '@/decorators/profile'
 import type { ViewPort } from '@/interfaces/ViewPort'
 import { getColor } from '@/utils/color'
 import { getMandelbrotNumber } from '@/utils/mandelbrot'
-import { getContext, zoom } from '@/utils/misc'
+import { getContext, move, zoom } from '@/utils/misc'
 import { MandelBrot } from './MandelBrot'
 
 export interface BoardConfig {
@@ -79,11 +79,13 @@ export class Board {
   }
 
   setMoveAction() {
-    this.canvas.addEventListener('mousedown', (event) => {
-      console.log('mousedown event: ', event)
+    this.canvas.addEventListener('mousedown', (startEvent) => {
+      console.log('mousedown event: ', startEvent)
 
-      const onMouseUp = (event: MouseEvent) => {
-        console.log('mouseup event: ', event)
+      const onMouseUp = (endEvent: MouseEvent) => {
+        console.log('mouseup event: ', endEvent)
+        this.config.viewPort = move(startEvent, endEvent, this.canvas, this.config.viewPort)
+        this.draw()
         document.removeEventListener('mouseup', onMouseUp)
       }
 
