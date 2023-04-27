@@ -76,12 +76,13 @@ export class Board {
   }
 
   setActions() {
-    this.canvas.addEventListener('click', (event) => {
+    this.canvas.addEventListener('wheel', (event) => {
       console.log('event: ', event)
+      const zoomFactor = event.deltaY > 0 ? 0.5 : 2
       const p = getCursorPositionInsideCanvas(this.canvas, event)
       const v = getCursorPositionInsideViewPort(this.canvas, p, this.config.viewPort)
       const ratio = getRatio(this.config.viewPort, v)
-      const zoomFactor = 2
+
       const newViewPort = getNewViewPort(zoomFactor, ratio, v, this.config.viewPort)
       this.config.viewPort = newViewPort
       this.draw()
