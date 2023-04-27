@@ -39,9 +39,23 @@ export class Board {
     this.createWorkers()
   }
   resizeViewPort() {
-    const rect = this.canvas.getBoundingClientRect()
+    this.canvas.width = 0
+    this.canvas.height = 0
+    this.canvas.style.width = '0'
+    this.canvas.style.height = '0'
+    const parentElt = this.canvas.parentElement
+    if (parentElt === null) {
+      throw new Error('no parent elt')
+    }
+
+    const rect = parentElt.getBoundingClientRect()
     this.canvas.width = rect.width
     this.canvas.height = rect.height
+    this.canvas.style.width = `${rect.width}px`
+    this.canvas.style.height = `${rect.height}px`
+
+    console.log('this.canvas.width: ', this.canvas.width)
+    console.log('this.canvas.height: ', this.canvas.height)
     this.config.viewPort.height =
       (this.config.viewPort.width * this.canvas.height) / this.canvas.width
   }
