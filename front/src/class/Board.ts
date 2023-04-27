@@ -1,4 +1,10 @@
-import { getContext } from '@/utils/misc'
+import {
+  getContext,
+  getCursorPositionInsideCanvas,
+  getCursorPositionInsideViewPort,
+  getNewViewPort,
+  getRatio
+} from '@/utils/misc'
 import { MandelBrot } from './MandelBrot'
 import { getMandelbrotNumber } from '@/utils/mandelbrot'
 import { getColor } from '@/utils/color'
@@ -7,9 +13,9 @@ import { profile } from '@/decorators/profile'
 
 export interface BoardConfig {
   fractal: MandelBrot
-  viewPort: ViewPort
   iterationMax: number
   limit: number
+  viewPort: ViewPort
 }
 
 export class Board {
@@ -32,6 +38,8 @@ export class Board {
     this.canvas.height = rect.height
     this.config.viewPort.height =
       (this.config.viewPort.width * this.canvas.height) / this.canvas.width
+
+    this.setActions()
   }
 
   @profile()
@@ -65,6 +73,25 @@ export class Board {
       }
     }
     ctx.putImageData(imageData, 0, 0)
+  }
+
+  setActions() {
+    this.canvas.addEventListener('click', (event) => {
+      console.log('event: ', event)
+      const p = getCursorPositionInsideCanvas(this.canvas, event)
+      console.log('p: ', p)
+      const v = getCursorPositionInsideViewPort(this.canvas, p, this.config.viewPort)
+      console.log('v: ', v)
+
+      const ratio = getRatio(this.config.viewPort, v)
+      console.log('ratio: ', ratio)
+
+      const zoomFactor = 2
+      const newViewPort = getNewViewPort(zoomFactor, ratio, v, this.config.viewPort)
+      console.log('newViewPort: ', newViewPort)
+      this.config.viewPort = newViewPort
+      this.draw()
+    })
   }
 
   setConfig(config: Partial<BoardConfig>) {

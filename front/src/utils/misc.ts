@@ -1,7 +1,51 @@
+import type { Point } from '@/interfaces/Point'
+import type { ViewPort } from '@/interfaces/ViewPort'
+
 export const getContext = (canvas: HTMLCanvasElement): CanvasRenderingContext2D => {
   const ctx = canvas.getContext('2d')
   if (ctx === null) {
     throw new Error('Canvas context not found')
   }
   return ctx
+}
+
+export const getCursorPositionInsideCanvas = (
+  canvas: HTMLCanvasElement,
+  event: MouseEvent
+): Point => {
+  const rect = canvas.getBoundingClientRect()
+  const x = event.clientX - rect.left
+  const y = event.clientY - rect.top
+  return { x, y }
+}
+
+export const getCursorPositionInsideViewPort = (
+  canvas: HTMLCanvasElement,
+  p: Point,
+  viewPort: ViewPort
+): Point => {
+  const rect = canvas.getBoundingClientRect()
+  const x = viewPort.x + p.x * (viewPort.width / rect.width)
+  const y = viewPort.y + p.y * (viewPort.height / rect.height)
+  return { x, y }
+}
+
+export const getRatio = (viewPort: ViewPort, v: Point): Point => {
+  return { x: (v.x - viewPort.x) / viewPort.width, y: (v.y - viewPort.y) / viewPort.height }
+}
+
+export const getNewViewPort = (
+  zoomFactor: number,
+  ratio: Point,
+  v: Point,
+  viewPort: ViewPort
+): ViewPort => {
+  const width = viewPort.width / zoomFactor
+  const height = viewPort.height / zoomFactor
+  return {
+    width,
+    height,
+    x: v.x - ratio.x * width,
+    y: v.y - ratio.y * height
+  }
 }
