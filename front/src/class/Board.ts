@@ -1,5 +1,6 @@
-import { profile } from '@/decorators/profile'
+import { profileAsync } from '@/decorators/profile'
 import type { ViewPort } from '@/interfaces/ViewPort'
+import type { WorkerInputData } from '@/interfaces/WorkerInputData'
 import { getColor } from '@/utils/color'
 import { getMandelbrotNumber } from '@/utils/mandelbrot'
 import { getContext, move, zoom } from '@/utils/misc'
@@ -45,41 +46,57 @@ export class Board {
     }
   }
 
-  @profile()
-  draw() {
-    for (let i = 0; i < this.workers.length; i++) {
-      const worker = this.workers[i]
-      worker.postMessage('coucou')
-    }
-    const width = this.canvas.width
-    console.log('width: ', width)
-    // const width = 10
-    const height = this.canvas.height
-    console.log('height: ', height)
-    // const height = 20
-    const ctx = getContext(this.canvas)
+  @profileAsync()
+  draw(): Promise<void> {
+    return new Promise((resolve) => {
+      let finishedJobs = 0
+      for (let i = 0; i < this.workers.length; i++) {
+        const worker = this.workers[i]
+        const workerInputData: WorkerInputData = {
+          i: i,
+          str: 'coucou'
+        }
+        worker.postMessage(workerInputData)
+        worker.onmessage = (e: MessageEvent<string>) => {
+          finishedJobs++
+          console.log(`worker finished: ${e.data}`)
+          if (finishedJobs === this.workers.length) {
+            console.log('all jobs finished')
 
-    const iterationMax = this.config.iterationMax
-    const limit = this.config.limit
-
-    const imageData = ctx.getImageData(0, 0, width, height)
-    const data = imageData.data
-    for (let x = 0; x < width; x++) {
-      for (let y = 0; y < height; y++) {
-        const index = (y * width + x) * 4
-
-        const xx = this.config.viewPort.x + (x * this.config.viewPort.width) / width
-        const yy = this.config.viewPort.y + (y * this.config.viewPort.height) / height
-
-        const mandelbrotNbr = getMandelbrotNumber({ x: xx, y: yy }, iterationMax, limit)
-        const [red, green, blue] = getColor(mandelbrotNbr, iterationMax)
-        data[index] = red
-        data[index + 1] = green
-        data[index + 2] = blue
-        data[index + 3] = 255
+            resolve()
+          }
+        }
       }
-    }
-    ctx.putImageData(imageData, 0, 0)
+      const width = this.canvas.width
+      console.log('width: ', width)
+      // const width = 10
+      const height = this.canvas.height
+      console.log('height: ', height)
+      // const height = 20
+      const ctx = getContext(this.canvas)
+
+      const iterationMax = this.config.iterationMax
+      const limit = this.config.limit
+
+      const imageData = ctx.getImageData(0, 0, width, height)
+      const data = imageData.data
+      for (let x = 0; x < width; x++) {
+        for (let y = 0; y < height; y++) {
+          const index = (y * width + x) * 4
+
+          const xx = this.config.viewPort.x + (x * this.config.viewPort.width) / width
+          const yy = this.config.viewPort.y + (y * this.config.viewPort.height) / height
+
+          const mandelbrotNbr = getMandelbrotNumber({ x: xx, y: yy }, iterationMax, limit)
+          const [red, green, blue] = getColor(mandelbrotNbr, iterationMax)
+          data[index] = red
+          data[index + 1] = green
+          data[index + 2] = blue
+          data[index + 3] = 255
+        }
+      }
+      ctx.putImageData(imageData, 0, 0)
+    })
   }
 
   setActions() {
@@ -95,11 +112,11 @@ export class Board {
     this.canvas.addEventListener('mousedown', (startEvent) => {
       console.log('mousedown event: ', startEvent)
 
-      const onMouseUp = (endEvent: MouseEvent) => {
+      const onMouseUp = async (endEvent: MouseEvent) => {
+        document.removeEventListener('mouseup', onMouseUp)
         console.log('mouseup event: ', endEvent)
         this.config.viewPort = move(startEvent, endEvent, this.canvas, this.config.viewPort)
-        this.draw()
-        document.removeEventListener('mouseup', onMouseUp)
+        await this.draw()
       }
 
       document.addEventListener('mouseup', onMouseUp)
@@ -107,10 +124,10 @@ export class Board {
   }
 
   setZoomAction() {
-    this.canvas.addEventListener('wheel', (event) => {
+    this.canvas.addEventListener('wheel', async (event) => {
       console.log('event: ', event)
       this.config.viewPort = zoom(event, this.canvas, this.config.viewPort)
-      this.draw()
+      await this.draw()
     })
   }
 }
