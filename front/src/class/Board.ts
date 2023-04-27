@@ -62,7 +62,9 @@ export class Board {
 
   createWorkers() {
     for (let i = 0; i < window.navigator.hardwareConcurrency; i++) {
-      this.workers.push(new Worker(new URL('./workers/mandelbrot.ts', import.meta.url)))
+      this.workers.push(
+        new Worker(new URL('./workers/mandelbrot.ts', import.meta.url), { type: 'module' })
+      )
     }
   }
 

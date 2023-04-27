@@ -1,39 +1,6 @@
-import type { Complex } from '@/interfaces/Complex'
 import type { WorkerInputData } from '@/interfaces/WorkerInputData'
 import type { WorkerOutputData } from '@/interfaces/WorkerOutputData'
-
-const add = (a: Complex, b: Complex): Complex => {
-  return {
-    x: a.x + b.x,
-    y: a.y + b.y
-  }
-}
-
-const multiply = (a: Complex, b: Complex): Complex => {
-  return {
-    x: a.x * b.x - a.y * b.y,
-    y: a.x * b.y + a.y * b.x
-  }
-}
-
-const module = (a: Complex): number => {
-  return Math.sqrt(a.x * a.x + a.y * a.y)
-}
-
-const increment = (z: Complex, c: Complex): Complex => {
-  return add(multiply(z, z), c)
-}
-
-const getMandelbrotNumber = (c: Complex, maxIteration: number, limit: number): number => {
-  let z: Complex = { x: 0, y: 0 }
-  for (let i = 0; i < maxIteration; i++) {
-    z = increment(z, c)
-    if (module(z) > limit) {
-      return i
-    }
-  }
-  return maxIteration
-}
+import { getMandelbrotNumber } from '@/utils/mandelbrot'
 
 const buildArray = (wid: WorkerInputData) => {
   const array: number[][] = []
