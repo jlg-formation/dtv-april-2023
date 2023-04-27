@@ -79,16 +79,10 @@ export class Board {
     this.canvas.addEventListener('click', (event) => {
       console.log('event: ', event)
       const p = getCursorPositionInsideCanvas(this.canvas, event)
-      console.log('p: ', p)
       const v = getCursorPositionInsideViewPort(this.canvas, p, this.config.viewPort)
-      console.log('v: ', v)
-
       const ratio = getRatio(this.config.viewPort, v)
-      console.log('ratio: ', ratio)
-
       const zoomFactor = 2
       const newViewPort = getNewViewPort(zoomFactor, ratio, v, this.config.viewPort)
-      console.log('newViewPort: ', newViewPort)
       this.config.viewPort = newViewPort
       this.draw()
     })
