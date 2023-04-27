@@ -5,8 +5,8 @@ import type { WorkerOutputData } from '@/interfaces/WorkerOutputData'
 import { getColor } from '@/utils/color'
 import { getContext, move, zoom } from '@/utils/misc'
 import { Mutex } from 'async-mutex'
+import { debounceTime, fromEvent, switchMap, throttleTime } from 'rxjs'
 import { MandelBrot } from './MandelBrot'
-import { fromEvent, switchMap, throttleTime } from 'rxjs'
 
 export interface BoardConfig {
   fractal: MandelBrot
@@ -33,21 +33,101 @@ export class Board {
   workers: Worker[] = []
 
   constructor(readonly canvas: HTMLCanvasElement) {
-    const rect = this.canvas.getBoundingClientRect()
+    this.resizeViewPort()
 
+    this.setActions()
+    this.createWorkers()
+  }
+  resizeViewPort() {
+    const rect = this.canvas.getBoundingClientRect()
     this.canvas.width = rect.width
     this.canvas.height = rect.height
     this.config.viewPort.height =
       (this.config.viewPort.width * this.canvas.height) / this.canvas.width
-
-    this.setActions()
-    this.createWorkers()
   }
 
   createWorkers() {
     for (let i = 0; i < window.navigator.hardwareConcurrency; i++) {
       this.workers.push(new Worker(new URL('./workers/mandelbrot.ts', import.meta.url)))
     }
+  }
+
+  @profileAsync()
+  async draw(): Promise<void> {
+    const width = this.canvas.width
+
+    // const width = 10
+    const height = this.canvas.height
+
+    // const height = 20
+    const ctx = getContext(this.canvas)
+
+    const iterationMax = this.config.iterationMax
+    const array = await this.getSynchronizedArray()
+
+    const imageData = ctx.getImageData(0, 0, width, height)
+    const data = imageData.data
+    for (let x = 0; x < width; x++) {
+      for (let y = 0; y < height; y++) {
+        const [red, green, blue] = getColor(array[x][y], iterationMax)
+        const index = (y * width + x) * 4
+        data[index] = red
+        data[index + 1] = green
+        data[index + 2] = blue
+        data[index + 3] = 255
+      }
+    }
+    ctx.putImageData(imageData, 0, 0)
+  }
+
+  setActions() {
+    this.setZoomAction()
+    this.setMoveAction()
+    this.setOnCanvasizeChangeAction()
+  }
+
+  setConfig(config: Partial<BoardConfig>) {
+    this.config = { ...this.config, ...config }
+  }
+
+  setMoveAction() {
+    this.canvas.addEventListener('mousedown', (startEvent) => {
+      const onMouseUp = async (endEvent: MouseEvent) => {
+        document.removeEventListener('mouseup', onMouseUp)
+        this.config.viewPort = move(startEvent, endEvent, this.canvas, this.config.viewPort)
+        await this.draw()
+      }
+
+      document.addEventListener('mouseup', onMouseUp)
+    })
+  }
+
+  setOnCanvasizeChangeAction() {
+    fromEvent(window, 'resize')
+      .pipe(
+        // tap(() => {
+        //   console.log('resize')
+        // }),
+        debounceTime(300),
+        switchMap(async () => {
+          console.log('resize')
+          this.resizeViewPort()
+          await this.draw()
+        })
+      )
+      .subscribe()
+  }
+
+  setZoomAction() {
+    fromEvent<WheelEvent>(this.canvas, 'wheel')
+      .pipe(
+        throttleTime(100),
+        switchMap(async (event) => {
+          this.config.viewPort = zoom(event, this.canvas, this.config.viewPort)
+          await this.draw()
+        })
+      )
+      .subscribe()
   }
 
   private getArray(): Promise<number[][]> {
@@ -88,66 +168,5 @@ export class Board {
     } finally {
       release()
     }
-  }
-
-  @profileAsync()
-  async draw(): Promise<void> {
-    const width = this.canvas.width
-
-    // const width = 10
-    const height = this.canvas.height
-
-    // const height = 20
-    const ctx = getContext(this.canvas)
-
-    const iterationMax = this.config.iterationMax
-    const array = await this.getSynchronizedArray()
-
-    const imageData = ctx.getImageData(0, 0, width, height)
-    const data = imageData.data
-    for (let x = 0; x < width; x++) {
-      for (let y = 0; y < height; y++) {
-        const [red, green, blue] = getColor(array[x][y], iterationMax)
-        const index = (y * width + x) * 4
-        data[index] = red
-        data[index + 1] = green
-        data[index + 2] = blue
-        data[index + 3] = 255
-      }
-    }
-    ctx.putImageData(imageData, 0, 0)
-  }
-
-  setActions() {
-    this.setZoomAction()
-    this.setMoveAction()
-  }
-
-  setConfig(config: Partial<BoardConfig>) {
-    this.config = { ...this.config, ...config }
-  }
-
-  setMoveAction() {
-    this.canvas.addEventListener('mousedown', (startEvent) => {
-      const onMouseUp = async (endEvent: MouseEvent) => {
-        document.removeEventListener('mouseup', onMouseUp)
-        this.config.viewPort = move(startEvent, endEvent, this.canvas, this.config.viewPort)
-        await this.draw()
-      }
-
-      document.addEventListener('mouseup', onMouseUp)
-    })
-  }
-
-  setZoomAction() {
-    fromEvent<WheelEvent>(this.canvas, 'wheel')
-      .pipe(
-        throttleTime(100),
-        switchMap(async (event) => {
-          this.config.viewPort = zoom(event, this.canvas, this.config.viewPort)
-          await this.draw()
-        })
-      )
-      .subscribe()
   }
 }
