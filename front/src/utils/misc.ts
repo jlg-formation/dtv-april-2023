@@ -2,7 +2,9 @@ import type { Point, Vector } from '@/interfaces/Point'
 import type { ViewPort } from '@/interfaces/ViewPort'
 
 export const getContext = (canvas: HTMLCanvasElement): CanvasRenderingContext2D => {
-  const ctx = canvas.getContext('2d')
+  const ctx = canvas.getContext('2d', {
+    willReadFrequently: true
+  })
   if (ctx === null) {
     throw new Error('Canvas context not found')
   }

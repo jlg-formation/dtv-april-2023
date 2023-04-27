@@ -34,7 +34,7 @@ export class Board {
 
   constructor(readonly canvas: HTMLCanvasElement) {
     const rect = this.canvas.getBoundingClientRect()
-    console.log('rect: ', rect)
+
     this.canvas.width = rect.width
     this.canvas.height = rect.height
     this.config.viewPort.height =
@@ -68,11 +68,10 @@ export class Board {
         worker.postMessage(workerInputData)
         worker.onmessage = (e: MessageEvent<WorkerOutputData>) => {
           finishedJobs++
-          console.log(`worker finished: ${e.data}`)
+
           const i = e.data.i
           arrayJobs[i] = e.data.array
           if (finishedJobs === this.workers.length) {
-            console.log('all jobs finished')
             const array: number[][] = []
             resolve(array.concat(...arrayJobs))
           }
@@ -94,10 +93,10 @@ export class Board {
   @profileAsync()
   async draw(): Promise<void> {
     const width = this.canvas.width
-    console.log('width: ', width)
+
     // const width = 10
     const height = this.canvas.height
-    console.log('height: ', height)
+
     // const height = 20
     const ctx = getContext(this.canvas)
 
@@ -130,11 +129,8 @@ export class Board {
 
   setMoveAction() {
     this.canvas.addEventListener('mousedown', (startEvent) => {
-      console.log('mousedown event: ', startEvent)
-
       const onMouseUp = async (endEvent: MouseEvent) => {
         document.removeEventListener('mouseup', onMouseUp)
-        console.log('mouseup event: ', endEvent)
         this.config.viewPort = move(startEvent, endEvent, this.canvas, this.config.viewPort)
         await this.draw()
       }
@@ -148,7 +144,6 @@ export class Board {
       .pipe(
         throttleTime(100),
         switchMap(async (event) => {
-          console.log('event: ', event)
           this.config.viewPort = zoom(event, this.canvas, this.config.viewPort)
           await this.draw()
         })

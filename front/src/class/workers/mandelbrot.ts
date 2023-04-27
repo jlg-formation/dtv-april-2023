@@ -52,9 +52,7 @@ const buildArray = (wid: WorkerInputData) => {
 }
 
 self.onmessage = (e: MessageEvent<WorkerInputData>) => {
-  console.log(`Message received from main script: `, e.data)
   const array = buildArray(e.data)
-  console.log('Posting message back to main script')
   const workerOutputData: WorkerOutputData = {
     array,
     i: e.data.i
