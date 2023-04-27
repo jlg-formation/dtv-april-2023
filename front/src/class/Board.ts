@@ -25,6 +25,8 @@ export class Board {
     limit: 2
   }
 
+  workers: Worker[] = []
+
   constructor(readonly canvas: HTMLCanvasElement) {
     const rect = this.canvas.getBoundingClientRect()
     console.log('rect: ', rect)
@@ -34,10 +36,21 @@ export class Board {
       (this.config.viewPort.width * this.canvas.height) / this.canvas.width
 
     this.setActions()
+    this.createWorkers()
+  }
+
+  createWorkers() {
+    for (let i = 0; i < window.navigator.hardwareConcurrency; i++) {
+      this.workers.push(new Worker(new URL('./workers/mandelbrot.ts', import.meta.url)))
+    }
   }
 
   @profile()
   draw() {
+    for (let i = 0; i < this.workers.length; i++) {
+      const worker = this.workers[i]
+      worker.postMessage('coucou')
+    }
     const width = this.canvas.width
     console.log('width: ', width)
     // const width = 10
