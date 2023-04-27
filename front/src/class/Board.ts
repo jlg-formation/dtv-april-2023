@@ -6,6 +6,7 @@ import { getColor } from '@/utils/color'
 import { getContext, move, zoom } from '@/utils/misc'
 import { Mutex } from 'async-mutex'
 import { MandelBrot } from './MandelBrot'
+import { fromEvent, switchMap, throttleTime } from 'rxjs'
 
 export interface BoardConfig {
   fractal: MandelBrot
@@ -143,10 +144,15 @@ export class Board {
   }
 
   setZoomAction() {
-    this.canvas.addEventListener('wheel', async (event) => {
-      console.log('event: ', event)
-      this.config.viewPort = zoom(event, this.canvas, this.config.viewPort)
-      await this.draw()
-    })
+    fromEvent<WheelEvent>(this.canvas, 'wheel')
+      .pipe(
+        throttleTime(100),
+        switchMap(async (event) => {
+          console.log('event: ', event)
+          this.config.viewPort = zoom(event, this.canvas, this.config.viewPort)
+          await this.draw()
+        })
+      )
+      .subscribe()
   }
 }
