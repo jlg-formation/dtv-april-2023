@@ -27,7 +27,8 @@ onMounted(async () => {
       switchMap(() => {
         board.setConfig({
           iterationMax: configStore.iterationMax,
-          limit: configStore.limit
+          limit: configStore.limit,
+          colorScheme: configStore.colorScheme
         })
         return board.draw()
       })

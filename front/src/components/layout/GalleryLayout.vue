@@ -24,6 +24,7 @@ const showImage = async (snapshot: Snapshot) => {
 
     configStore.iterationMax = snapshot.iterationMax
     configStore.limit = snapshot.limit
+    configStore.colorScheme = snapshot.colorScheme
   } catch (err) {
     console.log('err: ', err)
   }

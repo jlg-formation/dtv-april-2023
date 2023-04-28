@@ -5,5 +5,6 @@ export interface Snapshot {
   viewPort: ViewPort
   iterationMax: number
   limit: number
+  colorScheme: string
   imageDataURL: string
 }

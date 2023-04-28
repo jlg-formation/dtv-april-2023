@@ -1,7 +1,20 @@
 <script setup lang="ts">
 import { useConfigStore } from '@/stores/config'
+import { colorChoices } from '@/utils/color'
 
 const configStore = useConfigStore()
+
+const opts: string[] = Object.keys(colorChoices)
+
+const onSelect = (e: Event) => {
+  console.log('e: ', e)
+  const selectElt = e.target
+  console.log('selectElt: ', selectElt)
+  if (!(e.target instanceof HTMLSelectElement)) {
+    return
+  }
+  configStore.colorScheme = e.target.value
+}
 </script>
 
 <template>
@@ -16,11 +29,8 @@ const configStore = useConfigStore()
     </label>
     <label>
       <span>Color scheme: </span>
-      <select>
-        <option value="x">Tu choisis x</option>
-        <option value="y">Tu choisis y</option>
-        <option value="z">Tu choisis z</option>
-        <option value="t">Tu choisis t</option>
+      <select @change="onSelect" :value="opts[1]">
+        <option :value="opt" v-for="opt in opts" :key="opt">{{ opt }}</option>
       </select>
     </label>
   </div>

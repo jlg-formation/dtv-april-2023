@@ -3,7 +3,7 @@ import type { Snapshot } from '@/interfaces/Snapshot'
 import type { ViewPort } from '@/interfaces/ViewPort'
 import type { WorkerInputData } from '@/interfaces/WorkerInputData'
 import type { WorkerOutputData } from '@/interfaces/WorkerOutputData'
-import { getColor } from '@/utils/color'
+import { colorChoices, getColor } from '@/utils/color'
 import { getContext, move, zoom } from '@/utils/misc'
 import { Mutex } from 'async-mutex'
 import { debounceTime, fromEvent, switchMap, throttleTime } from 'rxjs'
@@ -14,6 +14,7 @@ export interface BoardConfig {
   iterationMax: number
   limit: number
   viewPort: ViewPort
+  colorScheme: string
 }
 
 const mutex = new Mutex()
@@ -30,7 +31,8 @@ export class Board {
       height: 3
     },
     iterationMax: 1,
-    limit: 2
+    limit: 2,
+    colorScheme: Object.keys(colorChoices)[1]
   }
 
   workers: Worker[] = []
@@ -69,7 +71,10 @@ export class Board {
     const data = imageData.data
     for (let x = 0; x < width; x++) {
       for (let y = 0; y < height; y++) {
-        const [red, green, blue] = getColor(array[x][y], iterationMax)
+        const [red, green, blue] = getColor(colorChoices[this.config.colorScheme])(
+          array[x][y],
+          iterationMax
+        )
         const index = (y * width + x) * 4
         data[index] = red
         data[index + 1] = green
@@ -159,7 +164,8 @@ export class Board {
       viewPort: { ...this.config.viewPort },
       imageDataURL,
       iterationMax: this.config.iterationMax,
-      limit: this.config.limit
+      limit: this.config.limit,
+      colorScheme: this.config.colorScheme
     }
     return snapshot
   }
