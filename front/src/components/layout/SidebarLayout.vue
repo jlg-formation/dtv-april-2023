@@ -1,13 +1,14 @@
 <script setup lang="ts">
 import CommandBar from '../sidebar/CommandBar.vue'
 import InfoBar from '../sidebar/InfoBar.vue'
+import DocumentationBar from '../sidebar/DocumentationBar.vue'
 </script>
 
 <template>
   <div class="sidebar">
-    <InfoBar />
+    <DocumentationBar />
     <CommandBar />
-    <div class="diagram"></div>
+    <InfoBar />
   </div>
 </template>
 
@@ -22,11 +23,6 @@ div.sidebar {
   div.info {
     flex: 0.3;
     background-color: #ccc;
-  }
-
-  div.diagram {
-    flex: 0.4;
-    background-color: #aaa;
   }
 }
 </style>

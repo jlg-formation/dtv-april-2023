@@ -59,6 +59,7 @@ div.gallery {
     display: flex;
     padding: 1em;
     button {
+      cursor: pointer;
       height: 100%;
     }
   }
@@ -71,6 +72,7 @@ div.gallery {
 
     div.slider-item {
       img {
+        cursor: pointer;
         height: 100%;
       }
     }

@@ -12,8 +12,11 @@ profiler.obs$.subscribe(() => {
 
 <template>
   <div class="info">
+    <div><b>Informations état système</b></div>
     <div>version {{ version }}</div>
-    <div v-for="[key, value] in map.entries()" :key="key">{{ key }}: {{ value.duration }}</div>
+    <div v-for="[key, value] in map.entries()" :key="key" title="Durée d'execution de fonction">
+      profile {{ key }}: {{ value.duration }}ms
+    </div>
   </div>
 </template>
 
