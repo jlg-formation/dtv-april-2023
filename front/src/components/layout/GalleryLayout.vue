@@ -16,6 +16,8 @@ const showImage = async (snapshot: Snapshot) => {
   try {
     console.log('show image')
     board.config.viewPort = { ...snapshot.viewPort }
+    board.config.iterationMax = snapshot.iterationMax
+    board.config.limit = snapshot.limit
     await board.draw()
   } catch (err) {
     console.log('err: ', err)

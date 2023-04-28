@@ -155,9 +155,11 @@ export class Board {
   takeSnapshot(): Snapshot {
     const imageDataURL = this.canvas.toDataURL()
     const snapshot: Snapshot = {
+      id: Math.round(Math.random() * 1e12),
       viewPort: { ...this.config.viewPort },
       imageDataURL,
-      id: Math.round(Math.random() * 1e12)
+      iterationMax: this.config.iterationMax,
+      limit: this.config.limit
     }
     return snapshot
   }
