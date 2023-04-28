@@ -1,9 +1,12 @@
 <script setup lang="ts">
 import { board } from '@/class/Board'
 import type { Snapshot } from '@/interfaces/Snapshot'
+import { useConfigStore } from '@/stores/config'
 import { ref } from 'vue'
 
 const snapshots = ref<Snapshot[]>([])
+
+const configStore = useConfigStore()
 
 const add = () => {
   console.log('add click')
@@ -18,7 +21,9 @@ const showImage = async (snapshot: Snapshot) => {
     board.config.viewPort = { ...snapshot.viewPort }
     board.config.iterationMax = snapshot.iterationMax
     board.config.limit = snapshot.limit
-    await board.draw()
+
+    configStore.iterationMax = snapshot.iterationMax
+    configStore.limit = snapshot.limit
   } catch (err) {
     console.log('err: ', err)
   }
