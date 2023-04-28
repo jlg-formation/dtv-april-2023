@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { getProfiler } from '@/utils/profiler'
 import { ref } from 'vue'
+import { version } from '../../../package.json'
 
 const profiler = getProfiler()
 const map = ref(profiler.map)
@@ -11,6 +12,7 @@ profiler.obs$.subscribe(() => {
 
 <template>
   <div class="info">
+    <div>version {{ version }}</div>
     <div v-for="[key, value] in map.entries()" :key="key">{{ key }}: {{ value.duration }}</div>
   </div>
 </template>
